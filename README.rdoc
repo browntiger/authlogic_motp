@@ -1,0 +1,67 @@
+= Authlogic MOTP
+
+Authlogic MOTP is an extension of the Authlogic library to add Mobile-OTP support.
+
+== Helpful links
+
+*	<b>Mobile-OTP:</b> http://motp.sourceforge.net
+*	<b>Authlogic:</b> http://github.com/binarylogic/authlogic
+
+== Requirements
+
+authlogic_motp requires, of course, that authlogic is installed on your server.
+It also assumes that registration of users (issuing/syncing secrets and PIN codes) will be handled by you.
+
+== Install and use
+
+=== 1. Install the Authlogic MOTP gem
+
+  $ sudo gem install authlogic_motp
+
+Now add the gem dependency in your config:
+
+  Gemfile (Rails 3):
+    gem 'authlogic_motp'
+  
+  config (Rails <3)
+    config.gem "authlogic_motp"
+
+=== 2. Make some simple changes to your database:
+
+  class AddUsersMotpFields < ActiveRecord::Migration
+    def self.up
+      add_column :users, :motp_secret, :string
+      add_column :users, :motp_pin, :string
+      add_column :users, :motp_cache, :string
+
+      change_column :users, :crypted_password, :string, :default => nil, :null => true
+      change_column :users, :password_salt, :string, :default => nil, :null => true
+    end
+
+    def self.down
+      remove_column :users, :motp_secret
+      remove_column :users, :motp_pin
+      remove_column :users, :motp_cache
+
+      [:crypted_password, :password_salt].each do |field|
+        User.all(:conditions => "#{field} is NULL").each { |user| user.update_attribute(field, "") if user.send(field).nil? }
+        change_column :users, field, :string, :default => "", :null => false
+      end
+    end
+  end
+  
+=== 2. Setup your views
+
+authlogic-motp expects the login and password fields in your login form to be named "otp-login" and "otp-password".
+The user should enter their usual login value, and then the OTP generated on their device for the password.
+
+=== 3. Issue credentials
+
+Each user will have to be issued a secret (in general a 16 character long HEX string), which they will use to initialize their account on the OTP device, and also a PIN (in general a 4 digit number) used to generate passwords.  Some client programs allow the secret to be generated on the device.  In this case the user will have to communicate both secret and pin to the administrator for registration.
+
+These should be stored in :motp_secret and :motp_pin respectively.
+  
+
+
+Copyright (c) 2011 Martin Chandler, released under the MIT license
+

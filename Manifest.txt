@@ -1,0 +1,12 @@
+CHANGELOG.rdoc
+MIT-LICENSE
+Manifest.txt
+README.rdoc
+Rakefile
+init.rb
+lib/authlogic_motp.rb
+lib/authlogic_motp/acts_as_authentic.rb
+lib/authlogic_motp/session.rb
+lib/authlogic_motp/version.rb
+rails/init.rb
+test/test_authlogic_motp.rb
