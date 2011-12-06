@@ -58,8 +58,16 @@ The user should enter their usual login value, and then the OTP generated on the
 === 3. Issue credentials
 
 Each user will have to be issued a secret (in general a 16 character long HEX string), which they will use to initialize their account on the OTP device, and also a PIN (in general a 4 digit number) used to generate passwords.  Some client programs allow the secret to be generated on the device.  In this case the user will have to communicate both secret and pin to the administrator for registration.
-
 These should be stored in :motp_secret and :motp_pin respectively.
+
+=== 4. Configure Mobile-OTP
+
+Mobile-OTP passwords are by default valid for 3 minutes before and three minutes after they are created, to give users time to enter the OTP into login forms, etc.  Authlogic_motp supports the ability to configure the amout in minutes the password is valid.  In your session model, set motp_maxperiod to the number of minutes required:
+
+  class UserSession < Authlogic::Session::Base
+    motp_maxperiod 2
+  end
+
   
 
 
